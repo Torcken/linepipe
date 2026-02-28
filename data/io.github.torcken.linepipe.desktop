@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Linepipe
+GenericName=pipx Package Manager
+Comment=A modern interface for managing pipx packages on Linux
+Exec=linepipe %u
+Icon=io.github.torcken.linepipe
+Terminal=false
+Categories=System;PackageManager;GTK;
+Keywords=pipx;pip;python;package;manager;install;
+StartupWMClass=linepipe
+StartupNotify=true
+MimeType=

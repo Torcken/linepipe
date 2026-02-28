@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.torcken.linepipe</id>
+  <name>Linepipe</name>
+  <summary>A modern GUI for managing pipx packages</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      Linepipe is a GTK4/Adwaita graphical interface for pipx, the tool that
+      installs and runs Python applications in isolated environments.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>List all installed pipx packages with version, Python info, and exposed apps</li>
+      <li>Install packages with optional version pinning and dependency inclusion</li>
+      <li>Upgrade individual packages or all at once</li>
+      <li>Uninstall packages with confirmation</li>
+      <li>Inject and uninject dependencies into existing venvs</li>
+      <li>Run exposed applications with custom arguments</li>
+      <li>Detect outdated packages by checking PyPI</li>
+      <li>Search PyPI with exact package name lookups</li>
+      <li>GNOME HIG-compliant with toast notifications and dark mode support</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.torcken.linepipe.desktop</launchable>
+
+  <url type="homepage">https://github.com/Torcken/linepipe</url>
+  <url type="bugtracker">https://github.com/Torcken/linepipe/issues</url>
+
+  <developer_name>Torcken</developer_name>
+
+  <provides>
+    <binary>linepipe</binary>
+  </provides>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+  </requires>
+
+  <recommends>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </recommends>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="1.0.0" date="2025-01-01">
+      <description>
+        <p>Initial release of Linepipe.</p>
+      </description>
+    </release>
+  </releases>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window showing installed packages</caption>
+    </screenshot>
+  </screenshots>
+</component>
