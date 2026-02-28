@@ -1,6 +1,6 @@
 # Linepipe
 
-A modern GTK4/Adwaita graphical interface for [pipx](https://pipx.pypa.io/) on Linux.
+A modern interface for [pipx](https://pipx.pypa.io/) on Linux.
 
 Linepipe lets you install, upgrade, uninstall, inject, and run pipx-managed Python
 applications through a native GNOME interface — no terminal required.
