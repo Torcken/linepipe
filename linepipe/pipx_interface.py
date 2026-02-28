@@ -171,7 +171,7 @@ def run_pipx_sync(args: list[str]) -> tuple[int, str]:
         result = subprocess.run(
             cmd, capture_output=True, text=True, env=env, timeout=60
         )
-        return result.returncode, result.stdout + result.stderr
+        return result.returncode, result.stdout
     except OSError as exc:
         return 1, str(exc)
     except subprocess.TimeoutExpired:
