@@ -34,6 +34,7 @@ from linepipe.dialogs import InjectDialog, InstallDialog, RunDialog
 from linepipe.package_list import PackageItem, PackageListView
 from linepipe.progress_dialog import ProgressDialog
 import linepipe.pipx_interface as pipx
+from linepipe.pipx_interface import FEATURED_PACKAGES
 from linepipe.notifications import send_notification
 
 
@@ -276,9 +277,22 @@ class MainWindow(Adw.ApplicationWindow):
         self._banner.set_revealed(False)
         pipx.get_installed_packages(self._on_packages_loaded)
 
+    def _featured_packages(self) -> list[dict]:
+        """Return FEATURED_PACKAGES, marking already-installed ones."""
+        installed_names = {p["name"] for p in self._packages}
+        result = []
+        for pkg in FEATURED_PACKAGES:
+            entry = dict(pkg)
+            if entry["name"] in installed_names:
+                entry["status"] = "installed"
+            result.append(entry)
+        return result
+
     def _on_packages_loaded(self, packages: list[dict]) -> None:
         self._packages = packages
-        self._package_list_view.set_packages(packages)
+        # Only push to the list view if not in search/featured mode
+        if self._current_category != "search":
+            self._package_list_view.set_packages(packages)
         self._update_category_counts()
         self._detail_panel.show_empty()
 
@@ -321,11 +335,14 @@ class MainWindow(Adw.ApplicationWindow):
         self._current_category = cat_id
 
         if cat_id == "search":
-            self._package_list_view.set_category("installed")
+            self._package_list_view.set_packages(self._featured_packages())
+            self._package_list_view.set_category("available")
             self._search_toggle.set_active(True)
             self._detail_panel.show_search_hint()
             GLib.idle_add(self._search_entry.grab_focus)
         else:
+            # Restore installed packages when leaving search
+            self._package_list_view.set_packages(self._packages)
             self._package_list_view.set_category(cat_id)
             self._detail_panel.show_empty()
 
@@ -378,7 +395,12 @@ class MainWindow(Adw.ApplicationWindow):
         if item is None:
             self._detail_panel.show_empty()
             return
-        self._detail_panel.show_package(item, is_pypi_result=False)
+        if item.status == "available":
+            # Featured package — query PyPI for full details
+            self._detail_panel.show_loading(item.name)
+            pipx.query_pypi(item.name, self._on_pypi_result)
+        else:
+            self._detail_panel.show_package(item, is_pypi_result=False)
 
     # ------------------------------------------------------------------
     # Detail panel callbacks

@@ -45,6 +45,43 @@ _pipx_path: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------
+# Curated list of popular pipx-installable tools
+# ---------------------------------------------------------------------------
+
+FEATURED_PACKAGES: list[dict] = [
+    {"name": "black",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "ruff",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "mypy",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "pylint",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "isort",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "bandit",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "poetry",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "pdm",           "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "hatch",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "pipenv",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "build",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "twine",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "httpie",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "rich-cli",      "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "ipython",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "jupyterlab",    "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "pre-commit",    "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "cookiecutter",  "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "ansible",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "awscli",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "yt-dlp",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "asciinema",     "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "glances",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "pgcli",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "litecli",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "tldr",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "speedtest-cli", "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "hecate",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "bpytop",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+    {"name": "nox",           "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
+]
+
+# ---------------------------------------------------------------------------
 # Discovery
 # ---------------------------------------------------------------------------
 

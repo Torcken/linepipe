@@ -36,6 +36,12 @@
     border: 1px solid alpha(#808080, 0.35);
 }
 
+.badge-available {
+    background-color: alpha(#1e6bbf, 0.18);
+    color: #4a9ef8;
+    border: 1px solid alpha(#1e6bbf, 0.40);
+}
+
 /* Package list column view tweaks */
 columnview.data-table > listview > row:selected {
     background-color: alpha(@accent_color, 0.15);

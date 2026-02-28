@@ -194,7 +194,7 @@ class PackageListView(Gtk.Box):
         box: Gtk.Box = item.get_child()
         badge: Gtk.Label = box.get_first_child()
 
-        for cls in ("badge-installed", "badge-outdated", "badge-unknown"):
+        for cls in ("badge-installed", "badge-outdated", "badge-unknown", "badge-available"):
             badge.remove_css_class(cls)
 
         if pkg.status == "outdated":
@@ -203,6 +203,9 @@ class PackageListView(Gtk.Box):
         elif pkg.status == "installed":
             badge.set_label("Installed")
             badge.add_css_class("badge-installed")
+        elif pkg.status == "available":
+            badge.set_label("Available")
+            badge.add_css_class("badge-available")
         else:
             badge.set_label("Unknown")
             badge.add_css_class("badge-unknown")
@@ -213,6 +216,8 @@ class PackageListView(Gtk.Box):
 
     def _filter_func(self, item: PackageItem, _user_data) -> bool:
         if self._category == "outdated" and item.status != "outdated":
+            return False
+        if self._category == "available" and item.status not in ("available", "installed"):
             return False
         if self._search_text:
             return self._search_text.lower() in item.name.lower()
