@@ -92,11 +92,22 @@ class MainWindow(Adw.ApplicationWindow):
         # Search bar (below header)
         self._search_bar = Gtk.SearchBar()
         self._search_bar.set_show_close_button(True)
+
+        search_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self._search_entry = Gtk.SearchEntry()
-        self._search_entry.set_placeholder_text("Search packages… (Enter for PyPI lookup)")
+        self._search_entry.set_placeholder_text("Filter installed… type a name + press Enter or click Search PyPI")
+        self._search_entry.set_hexpand(True)
         self._search_entry.connect("search-changed", self._on_search_changed)
         self._search_entry.connect("activate", self._on_search_activate)
-        self._search_bar.set_child(self._search_entry)
+        search_box.append(self._search_entry)
+
+        self._pypi_btn = Gtk.Button(label="Search PyPI")
+        self._pypi_btn.set_icon_name("system-search-symbolic")
+        self._pypi_btn.set_tooltip_text("Look up this package name on PyPI")
+        self._pypi_btn.connect("clicked", lambda _: self._on_search_activate(self._search_entry))
+        search_box.append(self._pypi_btn)
+
+        self._search_bar.set_child(search_box)
         self._search_bar.set_key_capture_widget(self)
         paned_box.append(self._search_bar)
 
@@ -161,16 +172,17 @@ class MainWindow(Adw.ApplicationWindow):
         menu_model = Gio.Menu()
         # Package operations section
         pkg_section = Gio.Menu()
-        pkg_section.append("Install Package…", "win.install")
-        pkg_section.append("Upgrade All",       "win.upgrade-all")
-        pkg_section.append("Reinstall All",     "win.reinstall-all")
+        pkg_section.append("Install Package…",  "win.install")
+        pkg_section.append("Upgrade All",        "win.upgrade-all")
+        pkg_section.append("Reinstall All",      "win.reinstall-all")
+        pkg_section.append("Check for Updates",  "win.check-updates")
         menu_model.append_section(None, pkg_section)
 
         # App section
         app_section = Gio.Menu()
-        app_section.append("Preferences",          "app.preferences")
-        app_section.append("Keyboard Shortcuts",    "app.shortcuts")
-        app_section.append("About Linepipe",        "app.about")
+        app_section.append("Preferences",       "app.preferences")
+        app_section.append("Keyboard Shortcuts", "app.shortcuts")
+        app_section.append("About Linepipe",     "app.about")
         menu_model.append_section(None, app_section)
 
         menu_btn = Gtk.MenuButton()
@@ -235,11 +247,12 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _register_window_actions(self) -> None:
         actions = [
-            ("install",      lambda *_: self._open_install_dialog()),
-            ("upgrade-all",  lambda *_: self._run_upgrade_all()),
-            ("reinstall-all",lambda *_: self._run_reinstall_all()),
-            ("refresh",      lambda *_: self._refresh_packages()),
-            ("focus-search", lambda *_: self._focus_search()),
+            ("install",        lambda *_: self._open_install_dialog()),
+            ("upgrade-all",    lambda *_: self._run_upgrade_all()),
+            ("reinstall-all",  lambda *_: self._run_reinstall_all()),
+            ("check-updates",  lambda *_: self._run_check_for_updates()),
+            ("refresh",        lambda *_: self._refresh_packages()),
+            ("focus-search",   lambda *_: self._focus_search()),
         ]
         for name, cb in actions:
             action = Gio.SimpleAction.new(name, None)
@@ -310,11 +323,12 @@ class MainWindow(Adw.ApplicationWindow):
         if cat_id == "search":
             self._package_list_view.set_category("installed")
             self._search_toggle.set_active(True)
+            self._detail_panel.show_search_hint()
             GLib.idle_add(self._search_entry.grab_focus)
         else:
             self._package_list_view.set_category(cat_id)
+            self._detail_panel.show_empty()
 
-        self._detail_panel.show_empty()
         self._pypi_result = None
 
     # ------------------------------------------------------------------
@@ -447,6 +461,21 @@ class MainWindow(Adw.ApplicationWindow):
             lambda ol, oc: pipx.upgrade_all_packages(ol, oc),
             success_msg="All packages upgraded.",
             error_msg="Upgrade-all encountered errors.",
+        )
+
+    def _run_check_for_updates(self) -> None:
+        pkgs = self._package_list_view.get_all_packages()
+        if not pkgs:
+            self._show_toast("No packages installed to check.")
+            return
+        from linepipe.utils import load_prefs
+        prefs = load_prefs()
+        pkg_dicts = [{"name": p.name, "version": p.version} for p in pkgs]
+        self._show_toast("Checking for updates…")
+        pipx.check_pypi_versions(
+            pkg_dicts,
+            self._on_pypi_version_result,
+            show_prerelease=prefs.get("show_prerelease", False),
         )
 
     def _run_reinstall_all(self) -> None:

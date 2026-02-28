@@ -67,6 +67,18 @@ class DetailPanel(Gtk.ScrolledWindow):
         status_page.set_vexpand(True)
         self._box.append(status_page)
 
+    def show_search_hint(self) -> None:
+        self._clear()
+        status_page = Adw.StatusPage()
+        status_page.set_icon_name("system-search-symbolic")
+        status_page.set_title("Search PyPI")
+        status_page.set_description(
+            'Type a package name in the search bar above, then press Enter '
+            'or click "Search PyPI" to look it up.'
+        )
+        status_page.set_vexpand(True)
+        self._box.append(status_page)
+
     def show_loading(self, name: str) -> None:
         self._clear()
         spinner = Gtk.Spinner()
