@@ -159,11 +159,19 @@ class MainWindow(Adw.ApplicationWindow):
 
         # Menu
         menu_model = Gio.Menu()
-        menu_model.append("Install Package…",   "win.install")
-        menu_model.append("Upgrade All",         "win.upgrade-all")
-        menu_model.append("Reinstall All",       "win.reinstall-all")
-        sep = Gio.Menu()
-        menu_model.append_section(None, sep)
+        # Package operations section
+        pkg_section = Gio.Menu()
+        pkg_section.append("Install Package…", "win.install")
+        pkg_section.append("Upgrade All",       "win.upgrade-all")
+        pkg_section.append("Reinstall All",     "win.reinstall-all")
+        menu_model.append_section(None, pkg_section)
+
+        # App section
+        app_section = Gio.Menu()
+        app_section.append("Preferences",          "app.preferences")
+        app_section.append("Keyboard Shortcuts",    "app.shortcuts")
+        app_section.append("About Linepipe",        "app.about")
+        menu_model.append_section(None, app_section)
 
         menu_btn = Gtk.MenuButton()
         menu_btn.set_icon_name("open-menu-symbolic")
