@@ -96,10 +96,12 @@ install_linepipe() {
     info "Installing Linepipe…"
     cd "$SCRIPT_DIR"
 
-    # Prefer pip3 from system if pipx or conda python is 3.12+
+    # Prefer system pip to avoid conda/venv pip which blocks --user installs.
+    # Try absolute system paths first, then fall back to PATH.
     local pip_cmd=""
-    for candidate in pip3.12 pip3.11 pip3 pip; do
-        if command -v "$candidate" &>/dev/null; then
+    for candidate in /usr/bin/pip3.12 /usr/bin/pip3.11 /usr/bin/pip3 \
+                     /usr/local/bin/pip3 pip3.12 pip3.11 pip3 pip; do
+        if [ -x "$candidate" ] 2>/dev/null || command -v "$candidate" &>/dev/null; then
             pip_cmd="$candidate"
             break
         fi
@@ -110,8 +112,39 @@ install_linepipe() {
         exit 1
     fi
 
-    "$pip_cmd" install --user --no-deps --break-system-packages . 2>/dev/null || \
-    "$pip_cmd" install --user --no-deps .
+    info "Using pip: $pip_cmd"
+
+    # If inside a virtualenv or conda env, --user is not allowed.
+    # Detect this and install without --user (into the active env) or
+    # explicitly use the system pip with --user.
+    local in_venv=0
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -n "${CONDA_DEFAULT_ENV:-}" ]; then
+        in_venv=1
+        warn "Active virtualenv/conda detected. Trying system pip for --user install."
+        # Re-resolve to a system pip outside the venv
+        local sys_pip=""
+        for candidate in /usr/bin/pip3.12 /usr/bin/pip3.11 /usr/bin/pip3 /usr/local/bin/pip3; do
+            if [ -x "$candidate" ]; then
+                sys_pip="$candidate"
+                break
+            fi
+        done
+        if [ -n "$sys_pip" ]; then
+            pip_cmd="$sys_pip"
+            in_venv=0
+            info "Switched to system pip: $pip_cmd"
+        fi
+    fi
+
+    if [ "$in_venv" -eq 0 ]; then
+        "$pip_cmd" install --user --no-deps --break-system-packages . 2>/dev/null || \
+        "$pip_cmd" install --user --no-deps .
+    else
+        # Last resort: install into the active env without --user
+        warn "Could not find system pip outside venv. Installing into active environment."
+        "$pip_cmd" install --no-deps .
+    fi
+
     success "Linepipe installed."
 }
 
