@@ -39,7 +39,7 @@ class DetailPanel(Gtk.ScrolledWindow):
 
     def __init__(self) -> None:
         super().__init__()
-        self.set_hscrollbar_policy(Gtk.PolicyType.NEVER)
+        self.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         self.set_min_content_width(280)
 
         self._current_name: str = ""
