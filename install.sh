@@ -35,7 +35,7 @@ install_system_deps() {
 
     case "$distro" in
         ubuntu|debian|linuxmint|pop)
-            info "Installing GTK4/Adwaita system dependencies via apt…"
+            info "Installing Linepipe system dependencies via apt…"
             sudo apt-get update -qq
             sudo apt-get install -y --no-install-recommends \
                 python3-gi python3-gi-cairo gir1.2-gtk-4.0 \
@@ -54,7 +54,7 @@ install_system_deps() {
                 python-gobject gtk4 libadwaita python-pip
             ;;
         opensuse*|suse*)
-            info "Installing GTK4/Adwaita system dependencies via zypper…"
+            info "Installing Linepipe dependencies via zypper…"
             sudo zypper install -y \
                 python3-gobject-cairo gtk4 libadwaita python3-pip
             ;;
@@ -204,7 +204,7 @@ check_path() {
 # ---------------------------------------------------------------------------
 main() {
     echo "============================================"
-    echo "  Linepipe Installer"
+    echo "  Linepipe Installer - 1.0"
     echo "============================================"
     echo ""
 

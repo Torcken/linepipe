@@ -33,8 +33,11 @@ from linepipe.detail_panel import DetailPanel
 from linepipe.dialogs import InjectDialog, InstallDialog, RunDialog
 from linepipe.package_list import PackageItem, PackageListView
 from linepipe.progress_dialog import ProgressDialog
+import threading
+
 import linepipe.pipx_interface as pipx
 from linepipe.pipx_interface import FEATURED_PACKAGES
+import linepipe.pypi_index as pypi_index
 from linepipe.notifications import send_notification
 
 
@@ -58,10 +61,16 @@ class MainWindow(Adw.ApplicationWindow):
         self._packages: list[dict] = []
         self._pypi_result: Optional[dict] = None
 
+        # Index search debounce / version tracking
+        self._search_debounce_id: Optional[int] = None
+        self._search_version: int = 0
+
         self._build_ui()
         self._register_window_actions()
 
         GLib.idle_add(self._refresh_packages)
+        pypi_index.load_top_into_memory(self._on_top_packages_loaded)
+        pypi_index.load_into_memory(self._on_index_loaded)
 
     # ------------------------------------------------------------------
     # UI construction
@@ -96,7 +105,7 @@ class MainWindow(Adw.ApplicationWindow):
 
         search_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
         self._search_entry = Gtk.SearchEntry()
-        self._search_entry.set_placeholder_text("Filter installed… type a name + press Enter or click Search PyPI")
+        self._search_entry.set_placeholder_text("Filter packages… (in Search PyPI: type to search full index)")
         self._search_entry.set_hexpand(True)
         self._search_entry.connect("search-changed", self._on_search_changed)
         self._search_entry.connect("activate", self._on_search_activate)
@@ -177,6 +186,7 @@ class MainWindow(Adw.ApplicationWindow):
         pkg_section.append("Upgrade All",        "win.upgrade-all")
         pkg_section.append("Reinstall All",      "win.reinstall-all")
         pkg_section.append("Check for Updates",  "win.check-updates")
+        pkg_section.append("Sync Package Index", "win.sync-index")
         menu_model.append_section(None, pkg_section)
 
         # App section
@@ -252,6 +262,7 @@ class MainWindow(Adw.ApplicationWindow):
             ("upgrade-all",    lambda *_: self._run_upgrade_all()),
             ("reinstall-all",  lambda *_: self._run_reinstall_all()),
             ("check-updates",  lambda *_: self._run_check_for_updates()),
+            ("sync-index",     lambda *_: self._run_sync_index()),
             ("refresh",        lambda *_: self._refresh_packages()),
             ("focus-search",   lambda *_: self._focus_search()),
         ]
@@ -278,15 +289,27 @@ class MainWindow(Adw.ApplicationWindow):
         pipx.get_installed_packages(self._on_packages_loaded)
 
     def _featured_packages(self) -> list[dict]:
-        """Return FEATURED_PACKAGES, marking already-installed ones."""
+        """Return the best available package list for the Search PyPI default view.
+
+        Priority: top-packages (ranked by downloads) > FEATURED_PACKAGES fallback.
+        Already-installed packages are marked with status='installed'.
+        """
         installed_names = {p["name"] for p in self._packages}
-        result = []
-        for pkg in FEATURED_PACKAGES:
-            entry = dict(pkg)
-            if entry["name"] in installed_names:
-                entry["status"] = "installed"
-            result.append(entry)
-        return result
+        top = pypi_index.get_top_packages()
+        source_names = top if top else [p["name"] for p in FEATURED_PACKAGES]
+        return [
+            {
+                "name": n,
+                "version": "",
+                "status": "installed" if n in installed_names else "available",
+                "apps": [],
+                "injected": [],
+                "python_version": "",
+                "venv_location": "",
+                "latest_version": "",
+            }
+            for n in source_names
+        ]
 
     def _on_packages_loaded(self, packages: list[dict]) -> None:
         self._packages = packages
@@ -317,12 +340,54 @@ class MainWindow(Adw.ApplicationWindow):
             if pkg and pkg.name == name:
                 self._detail_panel.show_package(pkg)
 
+    def _on_top_packages_loaded(self, count: int) -> None:
+        """Called when top-packages finish loading from SQLite."""
+        if count > 0:
+            self._update_category_counts()
+            if self._current_category == "search":
+                # Populate the view with ranked packages
+                text = self._search_entry.get_text().strip()
+                if not text:
+                    self._package_list_view.set_packages(self._featured_packages())
+                    self._package_list_view.set_category("available")
+        else:
+            # Table empty → first run: auto-fetch in background (silent)
+            pypi_index.fetch_top_packages(
+                on_line=None,
+                on_complete=self._on_top_packages_fetched,
+            )
+
+    def _on_top_packages_fetched(self, rc: int, _msg: str) -> None:
+        """Called when the background auto-fetch of top packages completes."""
+        if rc == 0:
+            self._update_category_counts()
+            if self._current_category == "search":
+                text = self._search_entry.get_text().strip()
+                if not text:
+                    self._package_list_view.set_packages(self._featured_packages())
+                    self._package_list_view.set_category("available")
+
+    def _on_index_loaded(self, count: int) -> None:
+        """Called when the full in-memory index finishes loading from SQLite."""
+        self._update_category_counts()
+        if count > 0 and self._current_category == "search":
+            text = self._search_entry.get_text().strip()
+            if text:
+                self._dispatch_index_search(text)
+
     def _update_category_counts(self) -> None:
         total = len(self._packages)
         outdated = self._package_list_view.get_outdated_count()
+        # Sidebar search label: prefer full-index count, fall back to top-packages count
+        search_count = pypi_index.get_memory_count() or pypi_index.get_top_count()
+
         self._count_labels["installed"].set_label(str(total) if total else "")
         self._count_labels["outdated"].set_label(str(outdated) if outdated else "")
-        self._count_labels["search"].set_label("")
+        if search_count:
+            label = f"{search_count // 1000}k" if search_count >= 1000 else str(search_count)
+            self._count_labels["search"].set_label(label)
+        else:
+            self._count_labels["search"].set_label("")
 
     # ------------------------------------------------------------------
     # Category selection
@@ -332,6 +397,7 @@ class MainWindow(Adw.ApplicationWindow):
         if row is None:
             return
         cat_id = getattr(row, "_cat_id", "installed")
+        coming_from_search = self._current_category == "search"
         self._current_category = cat_id
 
         if cat_id == "search":
@@ -340,9 +406,17 @@ class MainWindow(Adw.ApplicationWindow):
             self._search_toggle.set_active(True)
             self._detail_panel.show_search_hint()
             GLib.idle_add(self._search_entry.grab_focus)
-        else:
-            # Restore installed packages when leaving search
+        elif coming_from_search:
+            # Leaving search mode: restore real installed packages into the store
             self._package_list_view.set_packages(self._packages)
+            self._package_list_view.set_category(cat_id)
+            self._detail_panel.show_empty()
+        else:
+            # Switching between installed / outdated: only change the filter.
+            # set_packages() must NOT be called here — it would recreate
+            # PackageItem objects from the raw self._packages dicts (which always
+            # have status="installed"), discarding the statuses already written
+            # by update_package_status() into the live store items.
             self._package_list_view.set_category(cat_id)
             self._detail_panel.show_empty()
 
@@ -363,9 +437,73 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _on_search_changed(self, entry: Gtk.SearchEntry) -> None:
         text = entry.get_text().strip()
-        self._package_list_view.set_search(text)
+
+        if self._current_category != "search":
+            self._package_list_view.set_search(text)
+            if not text:
+                self._pypi_result = None
+            return
+
+        # In Search PyPI mode: cancel pending debounce timer
+        if self._search_debounce_id is not None:
+            GLib.source_remove(self._search_debounce_id)
+            self._search_debounce_id = None
+
         if not text:
+            # Reset to featured packages when query is cleared
+            self._package_list_view.set_packages(self._featured_packages())
+            self._package_list_view.set_category("available")
             self._pypi_result = None
+            return
+
+        if not pypi_index.is_loaded() and not pypi_index.has_top_packages():
+            # Nothing cached yet: filter the featured list locally while fetching
+            self._package_list_view.set_search(text)
+            return
+
+        # Debounce 150 ms then kick off a background search
+        self._search_debounce_id = GLib.timeout_add(
+            150, self._dispatch_index_search, text
+        )
+
+    def _dispatch_index_search(self, text: str) -> bool:
+        """Timer callback: start background index search for `text`."""
+        self._search_debounce_id = None
+        self._search_version += 1
+        version = self._search_version
+
+        def _worker() -> None:
+            if pypi_index.is_loaded():
+                results = pypi_index.search(text)
+            elif pypi_index.has_top_packages():
+                results = pypi_index.search_top(text)
+            else:
+                results = []
+            GLib.idle_add(self._apply_index_results, version, results)
+
+        threading.Thread(target=_worker, daemon=True).start()
+        return False  # don't repeat
+
+    def _apply_index_results(self, version: int, names: list) -> None:
+        """GTK main-thread: populate the list with index search results."""
+        if version != self._search_version:
+            return  # superseded by a newer search
+        installed_names = {p["name"] for p in self._packages}
+        pkgs = [
+            {
+                "name": n,
+                "version": "",
+                "status": "installed" if n in installed_names else "available",
+                "apps": [],
+                "injected": [],
+                "python_version": "",
+                "venv_location": "",
+                "latest_version": "",
+            }
+            for n in names
+        ]
+        self._package_list_view.set_packages(pkgs)
+        self._package_list_view.set_category("available")
 
     def _on_search_activate(self, entry: Gtk.SearchEntry) -> None:
         """On Enter: perform exact PyPI package lookup."""
@@ -506,6 +644,21 @@ class MainWindow(Adw.ApplicationWindow):
             lambda ol, oc: pipx.reinstall_all(ol, oc),
             success_msg="All packages reinstalled.",
             error_msg="Reinstall-all encountered errors.",
+        )
+
+    def _run_sync_index(self) -> None:
+        def on_done(returncode: int, _output: str) -> None:
+            self._update_category_counts()
+            if returncode == 0:
+                self._show_toast("Package index updated.")
+            else:
+                self._show_toast("Package index sync failed.")
+
+        ProgressDialog(
+            parent=self,
+            title="Syncing Package Index",
+            start_fn=lambda ol, oc: pypi_index.sync(ol, oc),
+            on_done=on_done,
         )
 
     # ------------------------------------------------------------------

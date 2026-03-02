@@ -1,9 +1,16 @@
 # Linepipe
 
-A modern interface for [pipx](https://pipx.pypa.io/) on Linux.
-
-Linepipe lets you install, upgrade, uninstall, inject, and run pipx-managed Python
+A modern interface for [pipx](https://pipx.pypa.io/) on Linux. 
+**Linepipe** lets you install, upgrade, uninstall, inject, and run pipx-managed Python
 applications through a native GNOME interface — no terminal required.
+
+![Linepipe Screenshot](data/screenshot.png)
+
+<a href="https://www.buymeacoffee.com/torcken" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" height="60" width="217">
+</a> 
+
+To **support** and **maintain** this project !
 
 ---
 
@@ -136,6 +143,19 @@ targeting pipx instead of Homebrew.
 
 ---
 
+<a href="https://www.buymeacoffee.com/torcken" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" height="60" width="217">
+</a> 
+
+To **support** and **maintain** this project !
+
+------
+
 ## License
 
-GNU General Public License v3.0 or later. See [LICENSE](LICENSE).
+Linepipe is licensed under the **GNU General Public License v3.0 or later**.
+See [LICENSE](LICENSE) for details.
+
+------
+
+Made with 🤍 by Torcken

@@ -266,14 +266,32 @@ class DetailPanel(Gtk.ScrolledWindow):
             hp_row.set_title("Homepage")
             hp_row.set_subtitle(info["home_page"])
             hp_row.set_subtitle_selectable(True)
+            hp_row.set_activatable(True)
+            hp_row.connect(
+                "activated",
+                lambda _row, url=info["home_page"]: self._open_url(url),
+            )
+            hp_row.add_suffix(Gtk.Image.new_from_icon_name("external-link-symbolic"))
             info_group.add(hp_row)
+
+        pypi_url = f"https://pypi.org/project/{name}/"
+        pypi_row = Adw.ActionRow()
+        pypi_row.set_title("PyPI Page")
+        pypi_row.set_subtitle(pypi_url)
+        pypi_row.set_subtitle_selectable(True)
+        pypi_row.set_activatable(True)
+        pypi_row.connect(
+            "activated",
+            lambda _row, url=pypi_url: self._open_url(url),
+        )
+        pypi_row.add_suffix(Gtk.Image.new_from_icon_name("external-link-symbolic"))
+        info_group.add(pypi_row)
 
         self._box.append(info_group)
 
         self._box.append(self._make_separator())
 
         install_btn = Gtk.Button(label=f"Install {name}")
-        install_btn.set_icon_name("list-add-symbolic")
         install_btn.add_css_class("suggested-action")
         install_btn.set_halign(Gtk.Align.FILL)
         install_btn.set_margin_top(12)
@@ -298,6 +316,17 @@ class DetailPanel(Gtk.ScrolledWindow):
         sep.set_margin_top(12)
         sep.set_margin_bottom(4)
         return sep
+
+    def _open_url(self, url: str) -> None:
+        import subprocess
+        try:
+            subprocess.Popen(
+                ["xdg-open", url],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except OSError:
+            pass
 
     @property
     def current_name(self) -> str:

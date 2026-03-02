@@ -52,6 +52,11 @@ class LinepipeApp(Adw.Application):
         self._load_css()
         self._apply_saved_scheme()
         self._register_actions()
+        self.connect("window-removed", self._on_window_removed)
+
+    def _on_window_removed(self, app: "LinepipeApp", _window: Gtk.Window) -> None:
+        if not app.get_windows():
+            app.quit()
 
     def _on_activate(self, _app: "LinepipeApp") -> None:
         win = self.get_active_window()
@@ -195,10 +200,12 @@ class LinepipeApp(Adw.Application):
         about = Adw.AboutDialog()
         about.set_application_name("Linepipe")
         about.set_version(__version__)
-        about.set_developer_name("Torcken")
+        about.set_developer_name("Torcken 🤍")
         about.set_license_type(Gtk.License.GPL_3_0)
         about.set_comments("A modern GUI for managing pipx packages on Linux")
         about.set_website("https://github.com/Torcken/linepipe")
+        about.set_developers(["Torcken 🤍"])
+        about.set_copyright("©2025 Made with love 🤍 by Torcken")
         about.set_application_icon(__app_id__)
         about.present(self.get_active_window())
 

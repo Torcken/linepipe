@@ -7,7 +7,7 @@ success() { echo -e "\033[0;32m[OK]\033[0m    $*"; }
 warn()    { echo -e "\033[0;33m[WARN]\033[0m  $*"; }
 
 echo "============================================"
-echo "  Linepipe Uninstaller"
+echo "  Linepipe Uninstaller - 1.0"
 echo "============================================"
 echo ""
 

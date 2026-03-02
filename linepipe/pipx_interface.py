@@ -48,38 +48,146 @@ _pipx_path: Optional[str] = None
 # Curated list of popular pipx-installable tools
 # ---------------------------------------------------------------------------
 
-FEATURED_PACKAGES: list[dict] = [
-    {"name": "black",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "ruff",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "mypy",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "pylint",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "isort",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "bandit",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "poetry",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "pdm",           "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "hatch",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "pipenv",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "build",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "twine",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "httpie",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "rich-cli",      "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "ipython",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "jupyterlab",    "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "pre-commit",    "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "cookiecutter",  "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "ansible",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "awscli",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "yt-dlp",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "asciinema",     "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "glances",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "pgcli",         "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "litecli",       "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "tldr",          "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "speedtest-cli", "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "hecate",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "bpytop",        "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-    {"name": "nox",           "version": "", "status": "available", "apps": [], "injected": [], "python_version": "", "venv_location": "", "latest_version": ""},
-]
+def _pkg(name: str) -> dict:
+    return {
+        "name": name, "version": "", "status": "available", "apps": [],
+        "injected": [], "python_version": "", "venv_location": "", "latest_version": "",
+    }
+
+
+FEATURED_PACKAGES: list[dict] = [_pkg(n) for n in [
+    # ── Code Quality & Linting ────────────────────────────────────────────
+    "black", "ruff", "mypy", "pylint", "isort", "bandit", "flake8",
+    "autopep8", "pycodestyle", "pydocstyle", "vulture", "radon", "xenon",
+    "prospector", "pyright", "semgrep", "dodgy", "safety", "pip-audit",
+    "creosote", "deptry", "refurb", "shed", "autoflake", "pyupgrade",
+    "ssort", "unimport", "tryceratops", "basedpyright", "ruff-lsp",
+    "dlint", "wemake-python-styleguide", "pylama", "eradicate",
+    "flake8-bugbear", "flake8-docstrings", "astpretty",
+    "pylsp-mypy", "python-lsp-server", "deadcode",
+    # ── Type Checking ─────────────────────────────────────────────────────
+    "pyre-check", "pyrefly",
+    # ── Testing ───────────────────────────────────────────────────────────
+    "pytest", "nox", "tox", "coverage", "hypothesis", "mutmut", "ward",
+    "behave", "robotframework", "tavern", "pytest-cov", "pytest-xdist",
+    "pytest-mock", "pytest-asyncio", "faker", "factory-boy", "responses",
+    "freezegun", "time-machine", "pyfakefs", "locust", "molotov",
+    "pytest-benchmark", "pytest-randomly", "pytest-sugar", "pytest-timeout",
+    "pytest-repeat", "nose2", "green", "pytest-html", "allure-pytest",
+    "schemathesis", "pact-python", "vcrpy", "httpretty", "respx",
+    # ── Build & Packaging ─────────────────────────────────────────────────
+    "poetry", "pdm", "hatch", "pipenv", "build", "twine", "flit", "uv",
+    "bumpversion", "bump2version", "tbump", "check-wheel-contents",
+    "check-manifest", "pyroma", "auditwheel", "pip-tools", "pipdeptree",
+    "pip-check", "johnnydepps", "cibuildwheel", "setuptools-scm",
+    "wheel", "installer", "pep517", "python-semantic-release",
+    # ── Documentation ─────────────────────────────────────────────────────
+    "mkdocs", "sphinx", "pdoc", "pydoc-markdown", "lazydocs", "portray",
+    "interrogate", "darglint", "docformatter", "griffe", "mike",
+    "towncrier", "gitchangelog", "mkdocstrings", "breathe",
+    "sphinx-autobuild", "myst-parser", "sphinx-copybutton",
+    # ── HTTP & API clients ────────────────────────────────────────────────
+    "httpie", "posting", "hurl",
+    # ── Database CLI ──────────────────────────────────────────────────────
+    "pgcli", "mycli", "litecli", "iredis", "sqlite-utils", "datasette",
+    "csvkit", "visidata", "alembic", "yoyo-migrations", "pg-activity",
+    "pgspecial", "sqlacodegen",
+    # ── DevOps & Cloud ────────────────────────────────────────────────────
+    "ansible", "ansible-lint", "ansible-core", "molecule", "fabric",
+    "invoke", "awscli", "sam-cli", "chalice", "zappa", "sceptre",
+    "cfn-lint", "checkov", "troposphere",
+    # ── Monitoring & Profiling ────────────────────────────────────────────
+    "glances", "bpytop", "speedtest-cli", "memory-profiler", "py-spy",
+    "scalene", "pyinstrument", "line-profiler",
+    # ── Security ──────────────────────────────────────────────────────────
+    "trufflehog", "detect-secrets", "sqlmap", "pwntools", "impacket",
+    "ossaudit", "liccheck", "pip-licenses",
+    # ── Data Science & Jupyter ────────────────────────────────────────────
+    "jupyterlab", "jupyter", "ipython", "notebook", "nbconvert",
+    "nbformat", "nbstripout", "nbqa", "papermill", "ploomber", "kedro",
+    "mlflow", "dvc", "wandb", "prefect", "great-expectations", "evidently",
+    "nbdime", "nbval", "ydata-profiling", "sweetviz",
+    # ── NLP ───────────────────────────────────────────────────────────────
+    "spacy", "nltk", "textblob", "gensim",
+    # ── Data Science Libraries ────────────────────────────────────────────
+    "pandas", "polars", "numpy", "scipy", "scikit-learn", "xgboost", "lightgbm",
+    # ── Visualization ─────────────────────────────────────────────────────
+    "matplotlib", "plotly", "seaborn", "altair", "bokeh",
+    # ── Media & Content ───────────────────────────────────────────────────
+    "yt-dlp", "gallery-dl", "beets", "spotdl", "scdl", "photini", "pytubefix",
+    # ── Terminal & Shell Utilities ────────────────────────────────────────
+    "rich-cli", "asciinema", "tldr", "cheat", "ranger", "pyfiglet",
+    "cowsay", "thefuck", "howdoi", "textual", "termtosvg",
+    "xonsh", "ptpython", "bpython", "ipdb", "pudb",
+    # ── Git Tools ─────────────────────────────────────────────────────────
+    "pre-commit", "commitizen", "gitlint", "gitchangelog", "git-fame",
+    "gita", "gitpython", "pygithub",
+    # ── Web Servers ───────────────────────────────────────────────────────
+    "uvicorn", "gunicorn", "hypercorn", "daphne", "granian", "waitress",
+    # ── Web Frameworks ────────────────────────────────────────────────────
+    "django", "flask", "fastapi", "starlette", "tornado", "bottle",
+    "falcon", "sanic", "quart", "connexion",
+    # ── Web Scraping ──────────────────────────────────────────────────────
+    "scrapy", "playwright", "mechanize", "beautifulsoup4", "selenium",
+    # ── Task Queues ───────────────────────────────────────────────────────
+    "celery", "rq", "dramatiq", "huey", "arq",
+    # ── ORM & Database Libs ──────────────────────────────────────────────
+    "sqlalchemy", "peewee", "piccolo", "tortoise-orm",
+    # ── Config & Data Formats ────────────────────────────────────────────
+    "yamllint", "jsonschema", "yq", "datamodel-code-generator",
+    # ── Task Runners ──────────────────────────────────────────────────────
+    "doit", "poethepoet", "taskipy",
+    # ── Project Scaffolding ───────────────────────────────────────────────
+    "cookiecutter", "cruft", "copier",
+    # ── Network Tools ─────────────────────────────────────────────────────
+    "mitmproxy", "scapy", "paramiko", "pysftp", "netaddr",
+    # ── Python Environment ────────────────────────────────────────────────
+    "virtualenv", "virtualenvwrapper", "pipx",
+    # ── Code Formatters ───────────────────────────────────────────────────
+    "yapf", "darker",
+    # ── CLI Frameworks & Input ────────────────────────────────────────────
+    "click", "typer", "docopt", "argcomplete", "prompt-toolkit",
+    "questionary", "halo", "yaspin",
+    # ── Terminal Output & Progress ────────────────────────────────────────
+    "rich", "colorama", "blessed", "urwid", "tqdm", "alive-progress",
+    # ── Serialization ─────────────────────────────────────────────────────
+    "marshmallow", "cattrs", "dacite", "msgpack",
+    # ── Configuration ─────────────────────────────────────────────────────
+    "dynaconf", "python-decouple", "environs",
+    # ── Time & Date ───────────────────────────────────────────────────────
+    "pendulum", "arrow", "python-dateutil", "humanize",
+    # ── Text Processing ───────────────────────────────────────────────────
+    "unidecode", "ftfy", "chardet",
+    # ── Retry & Resilience ────────────────────────────────────────────────
+    "tenacity", "backoff",
+    # ── Scheduling ────────────────────────────────────────────────────────
+    "schedule", "apscheduler",
+    # ── File Watching ─────────────────────────────────────────────────────
+    "watchdog", "watchfiles",
+    # ── Crypto & Security Libs ────────────────────────────────────────────
+    "cryptography", "pycryptodome", "passlib",
+    # ── GraphQL ───────────────────────────────────────────────────────────
+    "strawberry-graphql", "gql", "ariadne",
+    # ── Image Processing ─────────────────────────────────────────────────
+    "pillow", "wand", "imageio",
+    # ── PDF & Office ─────────────────────────────────────────────────────
+    "pypdf", "reportlab", "fpdf2", "openpyxl", "python-docx",
+    # ── Debugging ─────────────────────────────────────────────────────────
+    "snoop", "icecream", "pdbpp",
+    # ── Async Helpers ─────────────────────────────────────────────────────
+    "trio", "anyio", "aiofiles",
+    # ── Logging ───────────────────────────────────────────────────────────
+    "loguru", "structlog",
+    # ── HTTP Clients ──────────────────────────────────────────────────────
+    "httpx", "aiohttp", "requests",
+    # ── Data Validation ───────────────────────────────────────────────────
+    "pydantic", "attrs", "cerberus",
+    # ── Miscellaneous ─────────────────────────────────────────────────────
+    "pygments", "python-dotenv", "toml", "tomli", "click-repl",
+    "tabulate", "prettytable", "termcolor", "cachetools",
+    "python-magic", "chardet", "charset-normalizer",
+    "more-itertools", "toolz", "funcy", "boltons",
+]]
 
 # ---------------------------------------------------------------------------
 # Discovery
@@ -219,8 +327,50 @@ def run_pipx_sync(args: list[str]) -> tuple[int, str]:
 # Data queries
 # ---------------------------------------------------------------------------
 
+def _read_venvs_from_disk() -> list[dict]:
+    """Read package metadata directly from PIPX_HOME venv directories.
+
+    Used as a fallback when `pipx list --json` fails (e.g. due to a venv
+    whose pipx_metadata_version is unknown to the installed pipx).
+    """
+    pipx_home = os.environ.get("PIPX_HOME", os.path.expanduser("~/.local/share/pipx"))
+    venvs_dir = os.path.join(pipx_home, "venvs")
+    packages: list[dict] = []
+    try:
+        venv_names = sorted(os.listdir(venvs_dir))
+    except OSError:
+        return packages
+
+    for venv_name in venv_names:
+        meta_path = os.path.join(venvs_dir, venv_name, "pipx_metadata.json")
+        try:
+            with open(meta_path) as fh:
+                meta = json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            continue
+
+        main_pkg = meta.get("main_package", {})
+        injected = meta.get("injected_packages", {})
+        packages.append({
+            "name": main_pkg.get("package", venv_name),
+            "version": main_pkg.get("package_version", ""),
+            "python_version": meta.get("python_version", ""),
+            "apps": main_pkg.get("apps", []),
+            "injected": list(injected.keys()),
+            "venv_location": os.path.join(venvs_dir, venv_name),
+            "status": "installed",
+            "latest_version": "",
+        })
+
+    return packages
+
+
 def get_installed_packages(callback: Callable[[list[dict]], None]) -> None:
-    """Parse `pipx list --json` and call callback with list of package dicts."""
+    """Parse `pipx list --json` and call callback with list of package dicts.
+
+    Falls back to reading venv metadata directly from disk if the pipx
+    command fails (e.g. a venv with an unknown metadata version).
+    """
 
     def _worker() -> None:
         rc, out = run_pipx_sync(["list", "--json"])
@@ -235,31 +385,25 @@ def get_installed_packages(callback: Callable[[list[dict]], None]) -> None:
                     main_pkg = meta.get("main_package", {})
                     injected = meta.get("injected_packages", {})
 
-                    name = main_pkg.get("package", venv_name)
-                    version = main_pkg.get("package_version", "")
-                    python_version = meta.get("python_version", "")
-                    apps = main_pkg.get("apps", [])
-                    venv_args = meta.get("venv_args", [])
-
-                    # Compute venv location
                     pipx_home = os.environ.get(
                         "PIPX_HOME",
                         os.path.expanduser("~/.local/share/pipx")
                     )
-                    venv_location = os.path.join(pipx_home, "venvs", venv_name)
-
                     packages.append({
-                        "name": name,
-                        "version": version,
-                        "python_version": python_version,
-                        "apps": apps,
+                        "name": main_pkg.get("package", venv_name),
+                        "version": main_pkg.get("package_version", ""),
+                        "python_version": meta.get("python_version", ""),
+                        "apps": main_pkg.get("apps", []),
                         "injected": list(injected.keys()),
-                        "venv_location": venv_location,
+                        "venv_location": os.path.join(pipx_home, "venvs", venv_name),
                         "status": "installed",
                         "latest_version": "",
                     })
             except (json.JSONDecodeError, KeyError, TypeError):
                 pass
+
+        if not packages:
+            packages = _read_venvs_from_disk()
 
         GLib.idle_add(callback, packages)
 

@@ -120,6 +120,15 @@ class PreferencesDialog(Adw.PreferencesDialog):
         docs_row.add_suffix(docs_icon)
         docs_group.add(docs_row)
 
+        pypi_row = Adw.ActionRow()
+        pypi_row.set_title("PyPI")
+        pypi_row.set_subtitle("https://pypi.org/")
+        pypi_row.set_activatable(True)
+        pypi_row.connect("activated", self._on_pypi_clicked)
+        pypi_icon = Gtk.Image.new_from_icon_name("external-link-symbolic")
+        pypi_row.add_suffix(pypi_icon)
+        docs_group.add(pypi_row)
+
     # ------------------------------------------------------------------
     # Signal handlers
     # ------------------------------------------------------------------
@@ -150,6 +159,17 @@ class PreferencesDialog(Adw.PreferencesDialog):
         try:
             subprocess.Popen(
                 ["xdg-open", "https://pipx.pypa.io/"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except OSError:
+            pass
+
+    def _on_pypi_clicked(self, _row) -> None:
+        import subprocess
+        try:
+            subprocess.Popen(
+                ["xdg-open", "https://pypi.org/"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
             )
