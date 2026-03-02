@@ -53,26 +53,6 @@ The installer will:
 2. Install Linepipe with pip
 3. Install the `.desktop` file and icons for your launcher
 
-### Manual pip install
-
-```bash
-pip install --user .
-```
-
-Then copy the desktop/icon files manually:
-
-```bash
-cp data/io.github.torcken.linepipe.desktop ~/.local/share/applications/
-for size in 16 22 24 32 48 64 96 128 256 512 1024; do
-    mkdir -p ~/.local/share/icons/hicolor/${size}x${size}/apps
-    cp data/icons/hicolor/${size}x${size}/apps/io.github.torcken.linepipe.png \
-       ~/.local/share/icons/hicolor/${size}x${size}/apps/
-done
-gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor
-```
-
----
-
 ## Uninstall
 
 ```bash
