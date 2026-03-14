@@ -1,6 +1,14 @@
-# Linepipe
+<p align="center">
+  <img src="data/icons/hicolor/128x128/apps/io.github.torcken.linepipe.png" width="128">
+</p>
+<h1 align="center">Linepipe</h1>
+<p align="center">
+A Modern GNOME Interface for Pipx packages.
+</p>
 
-A modern interface for [pipx](https://pipx.pypa.io/) on Linux. 
+# 
+
+
 **Linepipe** lets you install, upgrade, uninstall, inject, and run pipx-managed Python
 applications through a native GNOME interface — no terminal required.
 
