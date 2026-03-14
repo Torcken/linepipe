@@ -37,6 +37,19 @@ To **support** and **maintain** this project !
 
 ---
 
+## Keyboard shortcuts
+
+| Shortcut        | Action                  |
+| --------------- | ----------------------- |
+| `Ctrl+R` / `F5` | Refresh installed list  |
+| `Ctrl+F`        | Focus search bar        |
+| `Ctrl+P`        | Open Preferences        |
+| `Ctrl+I`        | Open Install dialog     |
+| `?`             | Show keyboard shortcuts |
+| `Ctrl+Q`        | Quit                    |
+
+---
+
 ## Requirements
 
 - Linux with GTK 4.0+ and libadwaita 1.0+
@@ -76,60 +89,6 @@ Launch from your application menu or run:
 ```bash
 linepipe
 ```
-
-### Keyboard shortcuts
-
-| Shortcut       | Action                    |
-|----------------|---------------------------|
-| `Ctrl+R` / `F5`| Refresh installed list    |
-| `Ctrl+F`       | Focus search bar          |
-| `Ctrl+P`       | Open Preferences          |
-| `Ctrl+I`       | Open Install dialog       |
-| `?`            | Show keyboard shortcuts   |
-| `Ctrl+Q`       | Quit                      |
-
----
-
-## Configuration
-
-Preferences are stored in `~/.config/linepipe/config.json`:
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `pipx_path` | `""` | Custom path to pipx executable (auto-detect if empty) |
-| `color_scheme` | `"system"` | `"system"` / `"light"` / `"dark"` |
-| `include_deps` | `false` | Default `--include-deps` for installs |
-| `show_prerelease` | `false` | Include pre-releases when checking updates |
-
----
-
-## Architecture
-
-Linepipe is a faithful adaptation of [Linebrew](https://github.com/Torcken/linebrew),
-targeting pipx instead of Homebrew.
-
-| Module | Responsibility |
-|--------|---------------|
-| `application.py` | `Adw.Application` subclass, CSS loading, global actions |
-| `window.py` | Main window — sidebar, package list, detail pane |
-| `pipx_interface.py` | All subprocess wrappers for pipx CLI |
-| `package_list.py` | `Gio.ListStore` → `Gtk.FilterListModel` → `Gtk.ColumnView` |
-| `detail_panel.py` | Right pane: package info + action buttons |
-| `dialogs.py` | Install / Inject / Run dialogs |
-| `progress_dialog.py` | Streaming command output dialog |
-| `preferences.py` | `Adw.PreferencesDialog` + config I/O |
-| `notifications.py` | Desktop notification helper |
-| `utils.py` | Config I/O, version comparison |
-
-**Design decisions:**
-- All pipx commands run in daemon threads; GUI updates go through `GLib.idle_add()`
-- PyPI version checks run concurrently per-package, updating the list as results arrive
-- Session-level cache: PyPI results are applied to the model and not re-fetched until refresh
-- `packaging.version.Version` used for version comparison; falls back to tuple comparison
-- PyPI queries use `urllib.request` (stdlib) — no `requests` dependency
-- `shell=False` everywhere; OSError is caught gracefully
-
----
 
 <a href="https://www.buymeacoffee.com/torcken" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" height="60" width="217">
